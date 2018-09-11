@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,9 +19,13 @@ import com.google.firebase.auth.FirebaseUser;
 
 import com.google.firebase.firestore.Query;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final int RC_SIGN_IN = 1;
     public static final String MESSAGE_SEND_TIME = "Messages";
     private FirebaseUtils mFirebaseUtils = new FirebaseUtils();
     private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
@@ -35,7 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        mUid = user.getUid();
+
+        if(null != user){
+            mUid = user.getUid();
+        } else {
+            setUpAuthUILogin();
+        }
 
         Log.d(TAG, "MainActivity with User: " + mUid);
 
@@ -49,6 +59,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setUpAuthUILogin() {
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso("za").build(),
+                new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.GoogleBuilder().build());
+
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        //.setLogo(R.drawable.login_icon)
+                        //.setTheme(R.style.LoginTheme)
+                        .build(),
+                RC_SIGN_IN);
+
+    }
     private void bindView() {
         Log.d(TAG, "Binding main view links");
 
