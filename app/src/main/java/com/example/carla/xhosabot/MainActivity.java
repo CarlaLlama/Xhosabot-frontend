@@ -3,19 +3,30 @@ package com.example.carla.xhosabot;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Query;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //auth
+
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        currUid = user.getUid();
 
         Log.d(TAG, "MainActivity with User: ");
 
@@ -66,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLayoutManager);
         mMessageRecyclerView.setAdapter(mMessageAdapter);
@@ -80,6 +91,5 @@ public class MainActivity extends AppCompatActivity {
                 .collection(MESSAGES)
                 .document(mUserState.getId()).update(MESSAGE_NEW_RECEIVED, false);
 
-        hidePDialog();
     }
 }
