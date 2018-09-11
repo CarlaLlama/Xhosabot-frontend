@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String USERS = "Users";
     public static final String MESSAGES = "Messages";
     public static final String MESSAGE_SEND_TIME = "Messages";
+    private FirebaseUtils mFirebaseUtils = new FirebaseUtils();
     private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
     private RecyclerView mMessageRecyclerView;
     private EditText mMessageInput;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void displayChatMessages(){
-        Query query = mFirebaseUtil.getFirestore()
+        Query query = mFirebaseUtils.getFirestore()
                 .collection(USERS)
                 .document(mUid)
                 .collection(MESSAGES)
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void submitMessage(String userId, Message message){
         Log.d(TAG, "Submitting message: " + message.getMessageText());
-        CollectionReference collectionReference = mFirebaseUtil.getFirestore()
+        CollectionReference collectionReference = mFirebaseUtils.getFirestore()
                 .collection(USERS)
                 .document(userId)
                 .collection(MESSAGES);

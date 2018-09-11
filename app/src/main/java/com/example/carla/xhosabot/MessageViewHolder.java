@@ -6,17 +6,17 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-public class MessageViewHolder extends RecyclerView.ViewHolder {
+class MessageViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = MessageViewHolder.class.getSimpleName();
 
     private TextView messageText;
 
-    public MessageViewHolder(View view) {
+    MessageViewHolder(View view) {
         super(view);
         messageText = view.findViewById(R.id.message_text);
     }
 
-    public void bindData(final Message message) {
+    void bindData(final Message message) {
         try {
             if (message.isMessageFromBot()){
                 messageText.setGravity(Gravity.START);
