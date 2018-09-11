@@ -15,14 +15,12 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
+
 import com.google.firebase.firestore.Query;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String USERS = "Users";
-    public static final String MESSAGES = "Messages";
     public static final String MESSAGE_SEND_TIME = "Messages";
     private FirebaseUtils mFirebaseUtils = new FirebaseUtils();
     private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
@@ -58,13 +56,16 @@ public class MainActivity extends AppCompatActivity {
         mMessageRecyclerView = findViewById(R.id.messages_recycler_view);
     }
 
-
-
     private void displayChatMessages(){
+        if(null == mFirebaseUtils.getFirestore().collection(mUid)){
+            // figure out how to do this new user check
+            mFirebaseUtils.getFirestore()
+                    .collection(mUid)
+                    .add(new Message("Welcome Message!", true));
+        }
+
         Query query = mFirebaseUtils.getFirestore()
-                .collection(USERS)
-                .document(mUid)
-                .collection(MESSAGES)
+                .collection(mUid)
                 .orderBy(MESSAGE_SEND_TIME, Query.Direction.ASCENDING)
                 .limit(50);
 
@@ -108,12 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void submitMessage(String userId, Message message){
         Log.d(TAG, "Submitting message: " + message.getMessageText());
-        CollectionReference collectionReference = mFirebaseUtils.getFirestore()
-                .collection(USERS)
-                .document(userId)
-                .collection(MESSAGES);
+        mFirebaseUtils.getFirestore()
+                .collection(userId)
+                .add(message);
 
-        collectionReference.add(message);
         mMessageRecyclerView.scrollToPosition(mMessageRecyclerView.getChildCount());
     }
 }
