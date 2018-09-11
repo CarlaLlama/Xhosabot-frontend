@@ -4,20 +4,30 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.Query;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String USERS = "Users";
+    public static final String MESSAGES = "Messages";
+    public static final String MESSAGE_SEND_TIME = "Messages";
     private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
+    private RecyclerView mMessageRecyclerView;
+    private EditText mMessageInput;
+    private String mUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,25 +36,33 @@ public class MainActivity extends AppCompatActivity {
 
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        currUid = user.getUid();
+        mUid = user.getUid();
 
-        Log.d(TAG, "MainActivity with User: ");
+        Log.d(TAG, "MainActivity with User: " + mUid);
 
-
+        bindView();
         displayChatMessages();
 
         findViewById(R.id.send_button).setOnClickListener(view -> {
-            submitMessage(mUserState.getId(),
-                    new Message(mMessageInput.getText().toString(), false) );
+            submitMessage(mUid,
+                    new Message(mMessageInput.getText().toString(), false));
             mMessageInput.setText("");
         });
     }
 
+    private void bindView() {
+        Log.d(TAG, "Binding main view links");
+
+        mMessageInput = findViewById(R.id.message_input);
+        mMessageRecyclerView = findViewById(R.id.messages_recycler_view);
+    }
+
+
 
     private void displayChatMessages(){
         Query query = mFirebaseUtil.getFirestore()
-                .collection(MESSAGES)
-                .document(mUserState.getId())
+                .collection(USERS)
+                .document(mUid)
                 .collection(MESSAGES)
                 .orderBy(MESSAGE_SEND_TIME, Query.Direction.ASCENDING)
                 .limit(50);
@@ -85,11 +103,16 @@ public class MainActivity extends AppCompatActivity {
         mMessageAdapter.notifyDataSetChanged();
         mMessageRecyclerView.setHasFixedSize(true);
         mMessageAdapter.startListening();
+    }
 
-        Log.d(TAG, "User viewed chat, take away notification");
-        mFirebaseUtil.getFirestore()
-                .collection(MESSAGES)
-                .document(mUserState.getId()).update(MESSAGE_NEW_RECEIVED, false);
+    public void submitMessage(String userId, Message message){
+        Log.d(TAG, "Submitting message: " + message.getMessageText());
+        CollectionReference collectionReference = mFirebaseUtil.getFirestore()
+                .collection(USERS)
+                .document(userId)
+                .collection(MESSAGES);
 
+        collectionReference.add(message);
+        mMessageRecyclerView.scrollToPosition(mMessageRecyclerView.getChildCount());
     }
 }

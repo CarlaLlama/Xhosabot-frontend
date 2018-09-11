@@ -16,7 +16,7 @@ public class Message {
     public Message(){
     }
 
-    public Message(String messageText, boolean messageFromBot) {
+    Message(String messageText, boolean messageFromBot) {
         this.messageText = messageText;
         // false if message is from user, true if from bot
         this.messageFromBot = messageFromBot;
@@ -24,22 +24,21 @@ public class Message {
 
         Long timeLong = System.currentTimeMillis();
         Calendar cal = Calendar.getInstance();
-        TimeZone tz = cal.getTimeZone();//get your local time zone.
+        TimeZone tz = cal.getTimeZone();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.ENGLISH);
-        sdf.setTimeZone(tz);//set time zone.
+        sdf.setTimeZone(tz);
         String localTime = sdf.format(new Date(timeLong));
-        Date date = new Date();
-
+        Date sendTime = new Date();
         try {
-            messageSendTime = sdf.parse(localTime);
+            sendTime = sdf.parse(localTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        this.messageSendTime = messageSendTime;
+        this.messageSendTime = sendTime;
     }
 
-    public String getMessageText() {
+    String getMessageText() {
         return messageText;
     }
 
@@ -47,7 +46,7 @@ public class Message {
         this.messageText = messageText;
     }
 
-    public boolean isMessageFromBot() {
+    boolean isMessageFromBot() {
         return messageFromBot;
     }
 
@@ -66,7 +65,7 @@ public class Message {
     @Override
     public String toString() {
         return "Message: " + "{\n" + messageText + "\n"
-                + "fromZelda: " + messageFromBot + "\n"
+                + "fromBot: " + messageFromBot + "\n"
                 + "sendTime: " + messageSendTime + "\n}";
     }
 
