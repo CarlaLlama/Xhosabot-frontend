@@ -1,5 +1,6 @@
 package com.example.carla.xhosabot;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
-import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,14 +18,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 import com.google.firebase.firestore.Query;
 
-import java.util.Arrays;
-import java.util.List;
-
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final int RC_SIGN_IN = 1;
     public static final String MESSAGE_SEND_TIME = "Messages";
+    private FirebaseAuth mAuthListener;
+
     private FirebaseUtils mFirebaseUtils = new FirebaseUtils();
     private FirestoreRecyclerAdapter<Message, MessageViewHolder> mMessageAdapter;
     private RecyclerView mMessageRecyclerView;
@@ -37,44 +34,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        System.out.println("HERE1");
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        System.out.println("HERE2");
 
-        if(null != user){
+        if (user != null) {
             mUid = user.getUid();
+            Log.d(TAG, "MainActivity with User: " + mUid);
+            System.out.println("HERE3");
+
+            bindView();
+            displayChatMessages();
+
+            findViewById(R.id.send_button).setOnClickListener(view -> {
+                submitMessage(mUid,
+                        new Message(mMessageInput.getText().toString(), false));
+                mMessageInput.setText("");
+            });
+
         } else {
-            setUpAuthUILogin();
+            Log.d(TAG, "No user signed in. Open LoginActivity");
+            System.out.println("HERE4");
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         }
 
-        Log.d(TAG, "MainActivity with User: " + mUid);
-
-        bindView();
-        displayChatMessages();
-
-        findViewById(R.id.send_button).setOnClickListener(view -> {
-            submitMessage(mUid,
-                    new Message(mMessageInput.getText().toString(), false));
-            mMessageInput.setText("");
-        });
     }
 
-    private void setUpAuthUILogin() {
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso("za").build(),
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
 
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        //.setLogo(R.drawable.login_icon)
-                        //.setTheme(R.style.LoginTheme)
-                        .build(),
-                RC_SIGN_IN);
-
-    }
     private void bindView() {
         Log.d(TAG, "Binding main view links");
 
@@ -83,13 +72,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayChatMessages(){
-        if(null == mFirebaseUtils.getFirestore().collection(mUid)){
-            // figure out how to do this new user check
-            mFirebaseUtils.getFirestore()
-                    .collection(mUid)
-                    .add(new Message("Welcome Message!", true));
-        }
-
         Query query = mFirebaseUtils.getFirestore()
                 .collection(mUid)
                 .orderBy(MESSAGE_SEND_TIME, Query.Direction.ASCENDING)
@@ -141,4 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         mMessageRecyclerView.scrollToPosition(mMessageRecyclerView.getChildCount());
     }
+
+
 }
