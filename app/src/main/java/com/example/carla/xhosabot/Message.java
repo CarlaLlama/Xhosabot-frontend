@@ -1,6 +1,15 @@
 package com.example.carla.xhosabot;
 
 
+import android.support.annotation.Nullable;
+
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.IgnoreExtraProperties;
+import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.IUser;
+import com.stfalcon.chatkit.commons.models.MessageContentType;
+
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -8,17 +17,24 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Message {
-    private Date messageSendTime;
-    private String messageText;
-    private boolean messageFromBot;
+@IgnoreExtraProperties
+public class Message implements IMessage, Serializable, MessageContentType.Image {
+    public Date messageSendTime;
+    public String messageText;
+    public boolean messageFromBot;
+    @Exclude String userId;
+    @Exclude Author author;
+
+    String typingImage;
+
 
     public Message(){
+        typingImage = null;
     }
+
 
     Message(String messageText, boolean messageFromBot) {
         this.messageText = messageText;
-        // false if message is from user, true if from bot
         this.messageFromBot = messageFromBot;
 
 
@@ -54,7 +70,7 @@ public class Message {
         this.messageFromBot = messageFromBot;
     }
 
-    public Date getMessageSendTime() {
+    private Date getMessageSendTime() {
         return messageSendTime;
     }
 
@@ -69,4 +85,66 @@ public class Message {
                 + "sendTime: " + messageSendTime + "\n}";
     }
 
+    @Exclude
+    @Override
+    public String getId() {
+        if(this.userId.equals("WAIT_MESSAGE")) {
+            return "WAIT_MESSAGE";
+        }else if (messageFromBot){
+            return "Bot";
+        }else{
+            return "User";
+        }
+    }
+
+    @Exclude
+    @Override
+    public String getText() {
+        return messageText;
+    }
+
+    @Exclude
+    @Override
+    public Author getUser() {
+        return author;
+    }
+
+    @Exclude
+    public void setUser(){
+        String name;
+        String avatar;
+        if(messageFromBot){
+            name = "Bot";
+            avatar = "Bot";
+        }else{
+            name = "User";
+            avatar = null;
+        }
+        this.author = new Author(userId, name, avatar);
+    }
+
+    @Exclude
+    public void setId(String userId){
+        if(!messageFromBot) {
+            this.userId = userId;
+        } else if (null != userId){
+            this.userId = "Bot";
+        }
+    }
+
+    @Exclude
+    @Override
+    public Date getCreatedAt() {
+        return messageSendTime;
+    }
+
+    public void setTypingImage(){
+        typingImage = "gif";
+    }
+
+    @Nullable
+    @Override
+    public String getImageUrl() {
+        return typingImage;
+    }
 }

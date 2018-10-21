@@ -30,14 +30,9 @@ public class LoginActivity extends AppCompatActivity{
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = firebaseAuth -> {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                finish(); //?
-            } else {
-                Log.d(TAG, "onAuthStateChanged:signed_out");
-                setUpAuthUILogin();
-            }
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+            Log.d(TAG, "onAuthStateChanged:signed_out");
+            setUpAuthUILogin();
         };
     }
 
@@ -58,10 +53,11 @@ public class LoginActivity extends AppCompatActivity{
 
     }
 
-    private void sendWelcomeMessage(String uid){
+
+    public void submitDefaultStartMessage(String uid){
         mFirebaseUtils.getFirestore()
                 .collection(uid)
-                .add(new Message("Welcome Message!", true));
+                .add(new Message("Sawubona, nceda undibuze umbuzo", true));
     }
 
     @Override
@@ -77,9 +73,9 @@ public class LoginActivity extends AppCompatActivity{
                 Log.d(TAG, "Result ok");
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(null!=user){
-                    sendWelcomeMessage(user.getUid());
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("UID", user.getUid());
+                    submitDefaultStartMessage(user.getUid());
+                    Intent intent = new Intent(LoginActivity.this, StartActivity.class);
+                    intent.putExtra("USER", user.getUid());
                     startActivity(intent);
                     finish();
                 }

@@ -4,4 +4,20 @@
     <string name="sign_in_failed">Sign in failed.</string>
     <string name="sign_in_cancelled">Sign in cancelled.</string>
     <string name="sign_in_no_network">No network detected. Please connect to the internet.</string>
+
+    <string name="xhosa_bot">XhosaBot</string>
+    <string name="available">Available</string>
+
+    <string name="welcome_xho">Wamkelekile kwi<b>XhosaBot</b></string>
+    <string name="welcome_eng"><i>Welcome to XhosaBot</i></string>
+
+    <string name="instruction_xho">Ndilapha ukuza kunceda yonke imibuzo enxulumene nokukhulelwa.\n
+        Ndibuze imibuzo malunga nokugula kwasekuseni, i-pre-eclampsia, abasebenzi kunye nokukhulelwa iingcebiso. \n
+        Ndiyakwazi ukuphendula imibuzo malunga nosana lwakho olutsha.</string>
+    <string name="instruction_eng"><i>I\'m here to help with all your pregnancy related questions.\n
+        Ask me questions about morning sickness, pre-eclampsia, labour and pregnancy advice.
+        I can even answer questions about your newborn baby."</i>
+    </string>
+    <string name="button">Buza umbuzo</string>
+
 </resources>
