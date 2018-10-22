@@ -1,48 +1,29 @@
 package com.example.carla.xhosabot;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.Target;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.builder.AnimateGifMode;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.round;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private String mUid;
 
     private ImageLoader mImageLoader;
+
+    long startTime = 0;
+    long endTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,6 +122,12 @@ public class MainActivity extends AppCompatActivity {
                                 message.setUser();
                                 mMessagesListAdapter.addToStart(message, true);
                                 mMessagesList.setAdapter(mMessagesListAdapter);
+                                if(startTime != 0 && message.isMessageFromBot()){
+                                    endTime = System.nanoTime();
+                                    double seconds = (double)(endTime - startTime) / 1000000000.0;
+                                    Log.d(TAG, "DURATION: " + String.format("%.4f", seconds));
+                                    startTime = 0;
+                                }
                                 break;
                             default:
                                 return;
@@ -156,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseUtils.getFirestore()
                 .collection(mUid)
                 .add(message);
+        startTime = System.nanoTime();
     }
 
     public Message waitForBotMessage(){
