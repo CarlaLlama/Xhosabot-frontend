@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;

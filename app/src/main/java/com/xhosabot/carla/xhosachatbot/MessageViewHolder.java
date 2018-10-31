@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;

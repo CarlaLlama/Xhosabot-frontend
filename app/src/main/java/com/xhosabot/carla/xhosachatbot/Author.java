@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import com.stfalcon.chatkit.commons.models.IUser;
 

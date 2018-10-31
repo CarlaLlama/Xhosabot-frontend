@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 
 import android.support.annotation.Nullable;
@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 import com.stfalcon.chatkit.commons.models.IMessage;
-import com.stfalcon.chatkit.commons.models.IUser;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
 
 import java.io.Serializable;
@@ -82,7 +81,8 @@ public class Message implements IMessage, Serializable, MessageContentType.Image
     public String toString() {
         return "Message: " + "{\n" + messageText + "\n"
                 + "fromBot: " + messageFromBot + "\n"
-                + "sendTime: " + messageSendTime + "\n}";
+                + "sendTime: " + messageSendTime + "\n}"
+                + "id: " + getId() + "\n}";
     }
 
     @Exclude

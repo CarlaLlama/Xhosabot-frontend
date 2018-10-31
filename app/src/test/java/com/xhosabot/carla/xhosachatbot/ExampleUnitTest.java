@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import org.junit.Test;
 

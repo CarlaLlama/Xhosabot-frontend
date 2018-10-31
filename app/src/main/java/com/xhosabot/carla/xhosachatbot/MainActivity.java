@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -100,10 +101,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         mMessagesListAdapter = new MessagesListAdapter<>(mUid, mImageLoader);
+        mMessagesList.setAdapter(mMessagesListAdapter);
     }
 
 
     private void displayChatMessages(){
+        final Message[] waitMessage = {null};
         mFirebaseUtils.getFirestore()
                 .collection(mUid)
                 .orderBy(MESSAGE_SEND_TIME, Query.Direction.ASCENDING)
@@ -120,8 +123,12 @@ public class MainActivity extends AppCompatActivity {
                                 message =  dc.getDocument().toObject(Message.class);
                                 message.setId(mUid);
                                 message.setUser();
+                                Log.d(TAG, "Message data: " + message.toString());
+                                if(message.isMessageFromBot() && (null != waitMessage[0])){
+                                    mMessagesListAdapter.delete(waitMessage[0]);
+                                }
                                 mMessagesListAdapter.addToStart(message, true);
-                                mMessagesList.setAdapter(mMessagesListAdapter);
+                                (mMessagesList.getLayoutManager()).scrollToPosition(0);
                                 if(startTime != 0 && message.isMessageFromBot()){
                                     endTime = System.nanoTime();
                                     double seconds = (double)(endTime - startTime) / 1000000000.0;
@@ -134,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     if(null!=message && message.isMessageFromBot()){
-                        removeWaitForBotMessage();
+
                     }else {
-                        waitForBotMessage();
+                        waitMessage[0] = waitForBotMessage();
                     }
 
                 });
@@ -161,9 +168,6 @@ public class MainActivity extends AppCompatActivity {
         return typingMessage;
     }
 
-    public void removeWaitForBotMessage(){
-        mMessagesListAdapter.deleteById("WAIT_MESSAGE");
-    }
 
 
     @Override

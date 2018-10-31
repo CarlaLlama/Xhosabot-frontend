@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

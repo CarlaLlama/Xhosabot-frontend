@@ -1,4 +1,4 @@
-package com.example.carla.xhosabot;
+package com.xhosabot.carla.xhosachatbot;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,9 +30,18 @@ public class LoginActivity extends AppCompatActivity{
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = firebaseAuth -> {
+            Log.d(TAG, "Something");
         FirebaseUser user = firebaseAuth.getCurrentUser();
-            Log.d(TAG, "onAuthStateChanged:signed_out");
-            setUpAuthUILogin();
+            if (user != null) {
+                Log.d(TAG, "User: " + user.toString());
+
+                Intent intent = new Intent(LoginActivity.this, StartActivity.class);
+                intent.putExtra("USER", user.getUid());
+                startActivity(intent);
+            } else {
+                Log.d(TAG, "onAuthStateChanged:signed_out");
+                setUpAuthUILogin();
+            }
         };
     }
 
